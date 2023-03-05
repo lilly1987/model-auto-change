@@ -12,6 +12,7 @@ from modules.shared import opts, cmd_opts, state
 
 class Script(scripts.Script):  
     
+    v_max=getattr(opts, f"model-auto-change-max", 10)
     v_cnt=getattr(opts, f"model-auto-change-cnt", 0)
     v_model=None
     
@@ -21,8 +22,8 @@ class Script(scripts.Script):
             return
             
         #global v_cnt
-        print(f" v_cnt : { self.v_cnt }")
-        if self.v_cnt<10:
+        print(f" cnt : { self.v_cnt } / { self.v_max }")
+        if self.v_cnt<self.v_max:
             self.v_cnt+=1
             return
         self.v_cnt=0
@@ -58,14 +59,26 @@ class Script(scripts.Script):
 # for the different UI components you can use and how to create them.
 # Most UI components can return a value, such as a boolean for a checkbox.
 # The returned values are passed to the run method as parameters.
-
+    def next(self):
+        self.v_cnt=self.v_max
+        
     def ui(self, is_img2img):
         print(f"{self.title()} ui {is_img2img}")
         enabled = gr.Checkbox(value=False, label="model random apply")
+        accordion = gr.Group(visible=False)
+        enabled.change(
+            fn=lambda x: {"visible": x, "__type__": "update"},
+            inputs=[enabled],
+            outputs=[accordion],
+            show_progress = False)
+        with accordion:
+            max = gr.Slider(minimum=1,maximum=100,step=1,label='count max',value=10)
+            next_btn = gr.Button("next model")
+            next_btn.click(fn=self.next)
         #with gr.Group():
         #    with gr.Accordion(self.title(), open=False):
         #        enabled = gr.Checkbox(value=False, label="model random apply")
-        return [enabled]
+        return [enabled,max]
 
 
 
@@ -77,8 +90,11 @@ class Script(scripts.Script):
 # what is returned by the process_images method.
     def process(self, p
         , enabled
+        , max
     ):  #noHypernetwork,rHypernetworks,sd_hypernetwork_strength1,sd_hypernetwork_strength2,
         print(f"{self.title()} process")
+        
+        self.v_max=max
         self.chg(enabled)
         return 
         
