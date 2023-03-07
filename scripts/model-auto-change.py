@@ -17,8 +17,9 @@ class Script(scripts.Script):
     v_model=None
     
     def chg(self, enabled):
+        self.v_model=opts.sd_model_checkpoint 
         if not enabled:
-            logger.debug(f"{self.title()} disabled - exiting")
+            print(f"{self.title()} disabled - exiting")
             return
             
         #global v_cnt
@@ -28,8 +29,7 @@ class Script(scripts.Script):
             return
         self.v_cnt=0
         lst=list(sd_models.checkpoints_list.keys())
-        print(f" opts.sd_model_checkpoint : { lst }")
-        self.v_model=opts.sd_model_checkpoint 
+        print(f" opts.sd_model_checkpoint : { lst }")        
         opts.sd_model_checkpoint = random.choice(lst)
         print(f" opts.sd_model_checkpoint : { opts.sd_model_checkpoint }")
         sd_models.reload_model_weights()
