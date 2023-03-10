@@ -13,7 +13,7 @@ from modules.shared import opts, cmd_opts, state
 class Script(scripts.Script):  
     
     v_max=getattr(opts, f"model-auto-change-max", 10)
-    v_cnt=getattr(opts, f"model-auto-change-cnt", 0)
+    v_cnt=getattr(opts, f"model-auto-change-cnt", 1)
     v_model=None
     
     def chg(self, enabled):
@@ -27,7 +27,7 @@ class Script(scripts.Script):
         if self.v_cnt<self.v_max:
             self.v_cnt+=1
             return
-        self.v_cnt=0
+        self.v_cnt=1
         lst=list(sd_models.checkpoints_list.keys())
         print(f" opts.sd_model_checkpoint : { lst }")        
         opts.sd_model_checkpoint = random.choice(lst)
@@ -104,7 +104,7 @@ class Script(scripts.Script):
     #    , batch_number, prompts, seeds, subseeds
     #):  #noHypernetwork,rHypernetworks,sd_hypernetwork_strength1,sd_hypernetwork_strength2,
     #    print(f"{self.title()} process_batch")
-    #    chg(enabled)
+    #    #chg(enabled)
     #    return 
         
         
