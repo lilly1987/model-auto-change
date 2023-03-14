@@ -114,5 +114,5 @@ class Script(scripts.Script):
     
     def postprocess(self, *args):
         print(f"{self.title()} postprocess")
-        opts.sd_model_checkpoint = self.v_model
+        #opts.sd_model_checkpoint = self.v_model
         return
