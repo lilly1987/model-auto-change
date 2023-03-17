@@ -16,6 +16,19 @@ class Script(scripts.Script):
     v_cnt=getattr(opts, f"model-auto-change-cnt", 1)
     v_model=None
     
+    def maxSet(self):
+        self.v_cnt=self.v_max
+            
+    def nextSet(self):
+
+        lst=list(sd_models.checkpoints_list.keys())
+        print(f" opts.sd_model_checkpoint : { lst }")        
+        opts.sd_model_checkpoint = random.choice(lst)
+        print(f" opts.sd_model_checkpoint : { opts.sd_model_checkpoint }")
+        sd_models.reload_model_weights()
+        self.v_cnt=1
+        print(f" cnt : { self.v_cnt }")
+        
     def chg(self, enabled):
         self.v_model=opts.sd_model_checkpoint 
         if not enabled:
@@ -27,13 +40,8 @@ class Script(scripts.Script):
         if self.v_cnt<self.v_max:
             self.v_cnt+=1
             return
-        self.v_cnt=1
-        lst=list(sd_models.checkpoints_list.keys())
-        print(f" opts.sd_model_checkpoint : { lst }")        
-        opts.sd_model_checkpoint = random.choice(lst)
-        print(f" opts.sd_model_checkpoint : { opts.sd_model_checkpoint }")
-        sd_models.reload_model_weights()
-        print(f" cnt : { self.v_cnt }")
+
+        self.nextSet()
         
         return
     
@@ -59,8 +67,7 @@ class Script(scripts.Script):
 # for the different UI components you can use and how to create them.
 # Most UI components can return a value, such as a boolean for a checkbox.
 # The returned values are passed to the run method as parameters.
-    def next(self):
-        self.v_cnt=self.v_max
+
         
     def ui(self, is_img2img):
         print(f"{self.title()} ui {is_img2img}")
@@ -73,8 +80,10 @@ class Script(scripts.Script):
             show_progress = False)
         with accordion:
             max = gr.Slider(minimum=1,maximum=100,step=1,label='count max',value=10)
+            max_btn = gr.Button("count max set")
+            max_btn.click(fn=self.maxSet)
             next_btn = gr.Button("next model")
-            next_btn.click(fn=self.next)
+            next_btn.click(fn=self.nextSet)
         #with gr.Group():
         #    with gr.Accordion(self.title(), open=False):
         #        enabled = gr.Checkbox(value=False, label="model random apply")
